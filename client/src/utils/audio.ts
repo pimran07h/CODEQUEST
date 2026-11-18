@@ -60,13 +60,11 @@ class SoundEngine {
     // 126 BPM = ~119ms per 16th note
     const stepMs = 119;
 
-    // D Minor heroic progression: D - F - G - A - Bb - A - G - F
     const bassNotes = [
       73.42, 73.42, 87.31, 73.42, 98.00, 73.42, 110.00, 87.31,
       73.42, 73.42, 87.31, 73.42, 116.54, 110.00, 98.00, 87.31
     ];
 
-    // Iconic heroic lead melody (PUBG/Free Fire style brass synth)
     const melodySteps: { [step: number]: number } = {
       0: 293.66,  // D4
       4: 349.23,  // F4
@@ -83,20 +81,20 @@ class SoundEngine {
       const now = this.ctx.currentTime;
       const step16 = this.themeStep % 32;
 
-      // 1. KICK DRUM (Driving 4-on-the-floor on steps 0, 4, 8, 12, 16, 20, 24, 28)
+      // 1. KICK DRUM
       if (step16 % 4 === 0) {
         this.playDrumKick(now);
       }
 
-      // 2. SNARE (Punchy military/battle snare on steps 4, 12, 20, 28)
+      // 2. SNARE
       if (step16 % 8 === 4) {
         this.playDrumSnare(now);
       }
 
-      // 3. HI-HAT (Continuous 16th-note battle hi-hats with velocity dynamics)
+      // 3. HI-HAT
       this.playDrumHiHat(now, step16 % 2 === 0 ? 0.04 : 0.02);
 
-      // 4. BASSLINE SYNTH (D-minor cyber drive)
+      // 4. BASSLINE SYNTH
       const bassFreq = bassNotes[this.themeStep % bassNotes.length];
       this.playBassNote(now, bassFreq);
 
@@ -151,7 +149,6 @@ class SoundEngine {
 
   private playDrumSnare(now: number) {
     if (!this.ctx || !this.themeMasterGain) return;
-    // Tonal body
     const osc = this.ctx.createOscillator();
     const oscGain = this.ctx.createGain();
     osc.type = 'triangle';
@@ -164,7 +161,6 @@ class SoundEngine {
     osc.start(now);
     osc.stop(now + 0.1);
 
-    // Noise crack
     const bufferSize = this.ctx.sampleRate * 0.12;
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -237,7 +233,6 @@ class SoundEngine {
 
   private playLeadNote(now: number, freq: number) {
     if (!this.ctx || !this.themeMasterGain) return;
-    // Dual detuned saw oscillators for that epic AAA brass lead sound
     const osc1 = this.ctx.createOscillator();
     const osc2 = this.ctx.createOscillator();
     const filter = this.ctx.createBiquadFilter();
@@ -246,7 +241,7 @@ class SoundEngine {
     osc1.type = 'sawtooth';
     osc2.type = 'square';
     osc1.frequency.setValueAtTime(freq, now);
-    osc2.frequency.setValueAtTime(freq * 1.006, now); // slight chorus detune
+    osc2.frequency.setValueAtTime(freq * 1.006, now);
 
     filter.type = 'lowpass';
     filter.frequency.setValueAtTime(2200, now);
@@ -266,7 +261,274 @@ class SoundEngine {
     osc2.stop(now + 0.42);
   }
 
-  // CINEMATIC IMPACT BASS DROP (When player presses "START GAME" / "ENTER REALM")
+  // ==========================================
+  // GAME 1: MAZE ROBOT SOUNDS (PER LEVEL)
+  // ==========================================
+
+  // Distinct robot movement sound for Level 1, Level 2, and Level 3
+  public playMazeStep(level: number) {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    if (level === 1) {
+      // Level 1: Playful high 8-bit chip blip
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(440, now);
+      osc.frequency.exponentialRampToValueAtTime(620, now + 0.04);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+    } else if (level === 2) {
+      // Level 2: Deeper hydraulic servo click
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.exponentialRampToValueAtTime(140, now + 0.05);
+      gain.gain.setValueAtTime(0.16, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+    } else {
+      // Level 3: Resonant quantum phase pulse
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(680, now);
+      osc.frequency.exponentialRampToValueAtTime(320, now + 0.06);
+      gain.gain.setValueAtTime(0.18, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+    }
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.06);
+  }
+
+  // Pitch-escalating gem collect sound by gem count and level
+  public playGemPickup(gemCount: number, level: number) {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    // Scale notes based on level
+    const scales: { [lvl: number]: number[] } = {
+      1: [523.25, 587.33, 659.25, 783.99, 880.00, 1046.50], // C Maj Pentatonic
+      2: [659.25, 739.99, 830.61, 987.77, 1108.73, 1318.51], // E Maj Sparkle
+      3: [880.00, 987.77, 1174.66, 1318.51, 1567.98, 1760.00] // A Maj High Crystal
+    };
+
+    const notes = scales[level] || scales[1];
+    const freq = notes[Math.min(gemCount, notes.length - 1)];
+
+    const osc1 = this.ctx.createOscillator();
+    const osc2 = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc1.type = 'sine';
+    osc2.type = 'triangle';
+
+    osc1.frequency.setValueAtTime(freq, now);
+    osc2.frequency.setValueAtTime(freq * 1.5, now); // Fifth harmonic
+
+    gain.gain.setValueAtTime(0.18, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.28);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.28);
+    osc2.stop(now + 0.28);
+  }
+
+  // Triumphal Fanfare tailored to each maze level
+  public playMazeWin(level: number) {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const chords: { [lvl: number]: number[] } = {
+      1: [523.25, 659.25, 783.99, 1046.50], // Level 1: Bright C Major
+      2: [587.33, 739.99, 880.00, 1174.66], // Level 2: Victorious D Major
+      3: [659.25, 830.61, 987.77, 1318.51]  // Level 3: Majestic E Major
+    };
+
+    const notes = chords[level] || chords[1];
+    notes.forEach((freq, i) => {
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+      const st = now + i * 0.08;
+
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(freq, st);
+
+      gain.gain.setValueAtTime(0.2, st);
+      gain.gain.exponentialRampToValueAtTime(0.001, st + 0.45);
+
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+
+      osc.start(st);
+      osc.stop(st + 0.45);
+    });
+  }
+
+  // ==========================================
+  // GAME 2: BUG HUNTER SOUNDS (PER WAVE)
+  // ==========================================
+
+  // Laser zap tuned to wave intensity
+  public playBugZap(wave: number) {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+
+    if (wave === 1) {
+      // Wave 1: Crisp high-pitch electric laser tick
+      const osc = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(1400, now);
+      osc.frequency.exponentialRampToValueAtTime(300, now + 0.08);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+      osc.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.08);
+    } else if (wave === 2) {
+      // Wave 2: Plasma beam sizzle
+      const osc = this.ctx.createOscillator();
+      const filter = this.ctx.createBiquadFilter();
+      const gain = this.ctx.createGain();
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(900, now);
+      osc.frequency.exponentialRampToValueAtTime(150, now + 0.12);
+      filter.type = 'bandpass';
+      filter.frequency.setValueAtTime(800, now);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc.connect(filter);
+      filter.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.12);
+    } else {
+      // Wave 3: Quantum disintegrator zap (Deep bass crack + saw whip)
+      const osc1 = this.ctx.createOscillator();
+      const osc2 = this.ctx.createOscillator();
+      const gain = this.ctx.createGain();
+      osc1.type = 'sawtooth';
+      osc1.frequency.setValueAtTime(1800, now);
+      osc1.frequency.exponentialRampToValueAtTime(80, now + 0.15);
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(280, now);
+      osc2.frequency.exponentialRampToValueAtTime(45, now + 0.15);
+      gain.gain.setValueAtTime(0.35, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+      osc1.connect(gain);
+      osc2.connect(gain);
+      gain.connect(this.ctx.destination);
+      osc1.start(now);
+      osc2.start(now);
+      osc1.stop(now + 0.15);
+      osc2.stop(now + 0.15);
+    }
+  }
+
+  // Wave Victory Jingle
+  public playWaveVictory(wave: number) {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const baseFreq = 440 + wave * 60;
+    const notes = [baseFreq, baseFreq * 1.25, baseFreq * 1.5, baseFreq * 2];
+
+    notes.forEach((freq, idx) => {
+      const osc = this.ctx!.createOscillator();
+      const gain = this.ctx!.createGain();
+      const st = now + idx * 0.07;
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(freq, st);
+      gain.gain.setValueAtTime(0.18, st);
+      gain.gain.exponentialRampToValueAtTime(0.001, st + 0.35);
+      osc.connect(gain);
+      gain.connect(this.ctx!.destination);
+      osc.start(st);
+      osc.stop(st + 0.35);
+    });
+  }
+
+  // ==========================================
+  // GAME 3: STACK TOWER SOUNDS (LIFO)
+  // ==========================================
+
+  // PUSH: Pneumatic hydraulic cylinder slide & lock
+  public playStackPush() {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const filter = this.ctx.createBiquadFilter();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'sawtooth';
+    osc.frequency.setValueAtTime(260, now);
+    osc.frequency.exponentialRampToValueAtTime(620, now + 0.1); // Ascending slide
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(800, now);
+
+    gain.gain.setValueAtTime(0.25, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.12);
+  }
+
+  // POP: Spring-loaded recoil ejection snap
+  public playStackPop() {
+    if (this.isMuted) return;
+    this.initCtx();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(540, now);
+    osc.frequency.exponentialRampToValueAtTime(180, now + 0.09); // Descending pop snap
+
+    gain.gain.setValueAtTime(0.3, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.09);
+  }
+
+  // ==========================================
+  // GENERAL & CINEMATIC SOUNDS
+  // ==========================================
+
+  // Cinematic Impact Bass Drop (When player presses "START GAME")
   public playGameStartImpact() {
     if (this.isMuted) return;
     this.initCtx();
@@ -274,7 +536,6 @@ class SoundEngine {
 
     const now = this.ctx.currentTime;
     
-    // Sub-bass boom sweep (220Hz down to 25Hz)
     const boomOsc = this.ctx.createOscillator();
     const boomGain = this.ctx.createGain();
     boomOsc.type = 'sine';
@@ -289,7 +550,6 @@ class SoundEngine {
     boomOsc.start(now);
     boomOsc.stop(now + 1.2);
 
-    // Laser crack
     const laserOsc = this.ctx.createOscillator();
     const laserGain = this.ctx.createGain();
     laserOsc.type = 'sawtooth';
@@ -332,7 +592,7 @@ class SoundEngine {
     } catch {}
   }
 
-  // Futuristic UI Click sound
+  // UI Click sound
   public playClick() {
     if (this.isMuted) return;
     this.initCtx();
@@ -355,7 +615,7 @@ class SoundEngine {
     osc.stop(this.ctx.currentTime + 0.05);
   }
 
-  // Positive victory / test pass sound
+  // Positive victory sound
   public playSuccess() {
     if (this.isMuted) return;
     this.initCtx();
@@ -418,7 +678,7 @@ class SoundEngine {
     });
   }
 
-  // Error / test failure buzz
+  // Error buzz
   public playError() {
     if (this.isMuted) return;
     this.initCtx();
@@ -630,7 +890,7 @@ class SoundEngine {
     });
   }
 
-  // Ethereal ancient rune hum when approaching temple lock
+  // Ethereal ancient rune hum
   public playRuneHum() {
     if (this.isMuted) return;
     this.initCtx();
@@ -662,33 +922,6 @@ class SoundEngine {
     osc2.start(now);
     osc1.stop(now + 1.5);
     osc2.stop(now + 1.5);
-  }
-
-  // Discovery chime for clues & journal fragments
-  public playClueDiscovered() {
-    if (this.isMuted) return;
-    this.initCtx();
-    if (!this.ctx) return;
-
-    const now = this.ctx.currentTime;
-    const notes = [587.33, 739.99, 880, 1174.66];
-    notes.forEach((freq, idx) => {
-      const osc = this.ctx!.createOscillator();
-      const gain = this.ctx!.createGain();
-      const st = now + idx * 0.08;
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, st);
-
-      gain.gain.setValueAtTime(0.12, st);
-      gain.gain.exponentialRampToValueAtTime(0.001, st + 0.4);
-
-      osc.connect(gain);
-      gain.connect(this.ctx!.destination);
-
-      osc.start(st);
-      osc.stop(st + 0.4);
-    });
   }
 
   // Footstep audio on jungle soil

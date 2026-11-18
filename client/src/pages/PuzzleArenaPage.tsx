@@ -222,14 +222,14 @@ export const PuzzleArenaPage: React.FC = () => {
       return;
     }
 
-    sound.playClick();
+    sound.playMazeStep(currentLevel.id);
     setRobotDir(dir);
     setRobotPos({ x: nx, y: ny });
     setStepCount(s => s + 1);
 
     // Gem pickup
     if (mazeMap[ny][nx] === 2) {
-      sound.playCrystalCollect();
+      sound.playGemPickup(gemsCollected + 1, currentLevel.id);
       setGemsCollected(g => g + 1);
       const newMap = mazeMap.map((row, r) =>
         row.map((cell, c) => (r === ny && c === nx ? 0 : cell))
@@ -239,7 +239,7 @@ export const PuzzleArenaPage: React.FC = () => {
 
     // Exit check
     if (mazeMap[ny][nx] === 3) {
-      sound.playLevelUp();
+      sound.playMazeWin(currentLevel.id);
       setMazeWon(true);
       confetti({ particleCount: 90, spread: 80 });
 
@@ -369,13 +369,12 @@ export const PuzzleArenaPage: React.FC = () => {
   // Zap snippet action
   const zapCode = (id: number, isBug: boolean) => {
     if (isBug) {
-      sound.playSuccess();
-      sound.playClick();
+      sound.playBugZap(currentWave.wave);
       setBugScore(s => {
         const ns = s + 25;
         if (ns >= currentWave.targetScore) {
           setWaveWon(true);
-          sound.playLevelUp();
+          sound.playWaveVictory(currentWave.wave);
           confetti({ particleCount: 80 });
           try {
             api.submitCode(`bughunter-wave-${currentWave.wave}`, `wave_${currentWave.wave}`, 'javascript', user?.id || 'demo');
@@ -408,11 +407,11 @@ export const PuzzleArenaPage: React.FC = () => {
   const [stackScore, setStackScore] = useState(0);
 
   const pushToStack = (item: string) => {
-    sound.playClick();
     if (stackItems.length >= 6) {
       sound.playError();
       return;
     }
+    sound.playStackPush();
     setStackItems(prev => [...prev, item]);
   };
 
@@ -421,7 +420,7 @@ export const PuzzleArenaPage: React.FC = () => {
       sound.playError();
       return;
     }
-    sound.playSuccess();
+    sound.playStackPop();
     setStackItems(prev => prev.slice(0, prev.length - 1));
     setStackScore(s => s + 20);
   };
