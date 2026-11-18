@@ -1,0 +1,10 @@
+{
+  "name": "codequest-workspace",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "install:all": "npm --prefix server install && npm --prefix client install",
+    "client": "npm --prefix client run dev",
+    "server": "npm --prefix server run dev"
+  }
+}
