@@ -3,18 +3,18 @@
 > **Next-Generation Gamified Programming Learning Platform for B.Tech Engineering Students (1st to 4th Year)**  
 > *Play. Code. Conquer.*
 
-[![Live Game Online](https://img.shields.io/badge/PLAY%20LIVE%20ONLINE-Click%20To%20Play-brightgreen?style=for-the-badge&logo=googlechrome)](https://explicit-already-roles-accepting.trycloudflare.com)
+[![Live Game Online](https://img.shields.io/badge/PLAY%20LIVE%20ONLINE-Click%20To%20Play%20(24%2F7)-brightgreen?style=for-the-badge&logo=googlechrome)](https://pimran07h.github.io/CODEQUEST/)
 [![GitHub Repo](https://img.shields.io/badge/GitHub-pimran07h%2FCODEQUEST-blue?style=for-the-badge&logo=github)](https://github.com/pimran07h/CODEQUEST)
-[![Tech Stack](https://img.shields.io/badge/Tech-React%2018%20%7C%20TypeScript%20%7C%20Three.js%20%7C%20Node.js%20%7C%20Socket.IO-blueviolet?style=for-the-badge)](https://explicit-already-roles-accepting.trycloudflare.com)
+[![Tech Stack](https://img.shields.io/badge/Tech-React%2018%20%7C%20TypeScript%20%7C%20Three.js%20%7C%20Node.js%20%7C%20Socket.IO-blueviolet?style=for-the-badge)](https://pimran07h.github.io/CODEQUEST/)
 
 ---
 
-## 🌐 Live Game Links (Share with Friends)
+## 🌐 Live Game Links (24/7 Permanent Access — Mobile & Desktop)
 
-- 🎮 **Play Live Online (Mobile & Desktop)**: **[https://explicit-already-roles-accepting.trycloudflare.com](https://explicit-already-roles-accepting.trycloudflare.com)**
-- 🗿 **Direct 3D Jungle Adventure**: **[https://explicit-already-roles-accepting.trycloudflare.com/adventure](https://explicit-already-roles-accepting.trycloudflare.com/adventure)**
-- 🧩 **2D Puzzle Arcade**: **[https://explicit-already-roles-accepting.trycloudflare.com/puzzles](https://explicit-already-roles-accepting.trycloudflare.com/puzzles)**
-- ⚔️ **Live 1v1 PvP Battle Arena**: **[https://explicit-already-roles-accepting.trycloudflare.com/multiplayer](https://explicit-already-roles-accepting.trycloudflare.com/multiplayer)**
+- 🎮 **Play Live Online (24/7 Permanent Link)**: **[https://pimran07h.github.io/CODEQUEST/](https://pimran07h.github.io/CODEQUEST/)**
+- 🗿 **Direct 3D Jungle Adventure**: **[https://pimran07h.github.io/CODEQUEST/#/adventure](https://pimran07h.github.io/CODEQUEST/#/adventure)**
+- 🧩 **2D Puzzle Arcade**: **[https://pimran07h.github.io/CODEQUEST/#/puzzles](https://pimran07h.github.io/CODEQUEST/#/puzzles)**
+- ⚔️ **Live 1v1 PvP Battle Arena**: **[https://pimran07h.github.io/CODEQUEST/#/multiplayer](https://pimran07h.github.io/CODEQUEST/#/multiplayer)**
 
 ---
 
@@ -94,8 +94,9 @@
 
 ## 🏃 Quick Start Guide
 
-### 1. Play Instantly
-Simply open: **[https://explicit-already-roles-accepting.trycloudflare.com](https://explicit-already-roles-accepting.trycloudflare.com)**
+### 1. Play Instantly (24/7 Live URL)
+Simply open on any mobile phone, tablet, or PC:  
+👉 **[https://pimran07h.github.io/CODEQUEST/](https://pimran07h.github.io/CODEQUEST/)**
 
 ### 2. Run Locally
 ```bash
